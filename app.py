@@ -1,6 +1,7 @@
 from lan_chain import *
 import os
 from dotenv import load_dotenv
+import streamlit as st
 
 load_dotenv()
 
@@ -12,7 +13,7 @@ os.environ["COHERE_API_KEY"]=os.getenv("cohere_api_key")
 def language_model_chain():
     st.title("Language Model Chain - Multi_LLM")
     
-    provider = st.selectbox("Select provider", ["openai", "cohere", "fireworks"])
+    provider = st.selectbox("Select provider", ["openai", "cohere", "fireworks", "Local Model or Open Source Model"])
 
     if provider == "openai":
         available_models_openai = ["gpt-3.5-turbo", "model2", "model3"]
@@ -25,6 +26,10 @@ def language_model_chain():
     if provider == "fireworks":
         available_models_mixtral = ["model1", "model2", "accounts/fireworks/models/mixtral-8x7b-instruct"] 
         model_name = st.selectbox("Select Fireworks model", available_models_mixtral)
+    
+    if provider == "Local Model or Open Source Model":
+        available_models_ollama = ["model1", "model2", "llama2"] 
+        model_name = st.selectbox("Select Fireworks model", available_models_ollama)
 
     top_p = st.slider("Top P", min_value=0.1, max_value=1.0, step=0.1)
     temp = st.slider("Temperature", min_value=0.1, max_value=2.0, step=0.1)
