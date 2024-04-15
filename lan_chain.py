@@ -5,7 +5,7 @@ from langchain_cohere import ChatCohere
 from langchain_fireworks import ChatFireworks
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
-import streamlit as st
+from langchain_community.chat_models import ChatOllama
 
 
 def multimodel(model_name: str, top_p: float, temp: float, max_tokens: int):
@@ -29,7 +29,10 @@ def multimodel(model_name: str, top_p: float, temp: float, max_tokens: int):
                                                  fireworks=ChatFireworks(model_name=model_name,
                                                                          model_kwargs=kwargs,
                                                                          temperature=temp,
-                                                                         max_tokens=max_tokens))
+                                                                         max_tokens=max_tokens),
+                                                 llama=ChatOllama(model=model_name,
+                                                                  top_p=kwargs['top_p'],
+                                                                  temperature=temp))
     return model
 
 def chain(provider:str, question, **kwargs):
@@ -53,6 +56,9 @@ def chain(provider:str, question, **kwargs):
         elif provider == "fireworks":
             model = multimodel(**kwargs)
             chain = prompt | model.with_config(configurable={"provider": "fireworks"}) | StrOutputParser()
+        elif provider == "Local Model or Open Source Model":
+            model = multimodel(**kwargs)
+            chain = prompt | model.with_config(configurable={"provider": "llama"}) | StrOutputParser()
         else:
             raise ValueError("Invalid provider specified.")
     except Exception as e:
